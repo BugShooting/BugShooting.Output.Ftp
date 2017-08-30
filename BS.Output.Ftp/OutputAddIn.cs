@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
+using System.Net;
 using System.Windows.Forms;
 using System.ServiceModel;
 using System.Web;
@@ -66,7 +68,7 @@ namespace BS.Output.Ftp
       if (edit.ShowDialog() == true) {
 
         return new Output(edit.OutputName,
-                          edit.Url,
+                          edit.Server,
                           edit.Port,
                           edit.PassiveMode,
                           edit.UserName,
@@ -91,7 +93,7 @@ namespace BS.Output.Ftp
       OutputValueCollection outputValues = new OutputValueCollection();
 
       outputValues.Add(new OutputValue("Name", Output.Name));
-      outputValues.Add(new OutputValue("Url", Output.Url));
+      outputValues.Add(new OutputValue("Server", Output.Server));
       outputValues.Add(new OutputValue("Port", Output.Port.ToString()));
       outputValues.Add(new OutputValue("PassiveMode", Convert.ToString(Output.PassiveMode)));
       outputValues.Add(new OutputValue("UserName", Output.UserName));
@@ -111,7 +113,7 @@ namespace BS.Output.Ftp
     {
 
       return new Output(OutputValues["Name", this.Name].Value,
-                        OutputValues["Url", ""].Value,
+                        OutputValues["Server", ""].Value,
                         Convert.ToInt32(OutputValues["Port", Convert.ToString(21)].Value),
                         Convert.ToBoolean(OutputValues["PassiveMode", Convert.ToString(false)].Value),
                         OutputValues["UserName", ""].Value,
@@ -131,8 +133,161 @@ namespace BS.Output.Ftp
       try
       {
 
-        // TODO
-        return null;
+        string fileName = V3.FileHelper.GetFileName(Output.FileName, Output.FileFormat, ImageData);
+
+        // Show send window
+        Send send = new Send(Output.Server, Output.Port, Output.RemotePath, fileName);
+
+        var sendOwnerHelper = new System.Windows.Interop.WindowInteropHelper(send);
+        sendOwnerHelper.Owner = Owner.Handle;
+
+        if (!send.ShowDialog() == true)
+        {
+          return new V3.SendResult(V3.Result.Canceled);
+        }
+
+        string url = string.Format("ftp://{0}:{1}/{2}/", Output.Server, Output.Port, send.RemotePath);
+        string fullFileName = send.FileName + "." + V3.FileHelper.GetFileExtention(Output.FileFormat);
+        
+        string userName = Output.UserName;
+        string password = Output.Password;
+        bool showLogin = string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password);
+        bool rememberCredentials = false;
+        
+        while (true)
+        {
+
+          if (showLogin)
+          {
+
+            // Show credentials window
+            Credentials credentials = new Credentials(Output.Server, Output.Port, Output.RemotePath, userName, password, rememberCredentials);
+
+            var credentialsOwnerHelper = new System.Windows.Interop.WindowInteropHelper(credentials);
+            credentialsOwnerHelper.Owner = Owner.Handle;
+
+            if (credentials.ShowDialog() != true)
+            {
+              return new V3.SendResult(V3.Result.Canceled);
+            }
+
+            userName = credentials.UserName;
+            password = credentials.Password;
+            rememberCredentials = credentials.Remember;
+
+          }
+
+          try
+          {
+            
+            // Check if file already exists
+            if (!Output.OverwriteExistingFile)
+            {
+            
+              FtpWebRequest listRequest = (FtpWebRequest)WebRequest.Create(url);
+              listRequest.Method = WebRequestMethods.Ftp.ListDirectory;
+              listRequest.UsePassive = Output.PassiveMode;
+              listRequest.Credentials = new NetworkCredential(userName, password);
+
+              using (FtpWebResponse response = (FtpWebResponse)listRequest.GetResponse())
+              {
+                long size = response.ContentLength;
+                using (Stream dataStream = response.GetResponseStream())
+                {
+                  using (StreamReader reader = new StreamReader(dataStream))
+                  {
+
+                    string line = reader.ReadLine();
+                  
+                    while (line != null)
+                    {
+
+                      if (line == fullFileName)
+                      {
+
+                        if (MessageBox.Show(Owner, string.Format("File \'{0}\' already exists.\nOverwrite?", fullFileName), Output.Name, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                          break;
+                        }
+                        else
+                        {
+                          return new V3.SendResult(V3.Result.Canceled);
+                        }
+
+                      }
+
+                      line = reader.ReadLine();
+                    }
+
+                    reader.Close();
+                  }
+                  dataStream.Close();
+                }
+                response.Close();
+              }
+
+            }
+
+
+            string fileUrl = url + fullFileName;
+            byte[] fileBytes = V3.FileHelper.GetFileBytes(Output.FileFormat, ImageData);
+
+            // Upload file
+            FtpWebRequest uploadRequest = (FtpWebRequest)WebRequest.Create(fileUrl);
+            uploadRequest.Method = WebRequestMethods.Ftp.UploadFile;
+            uploadRequest.UsePassive = Output.PassiveMode;
+            uploadRequest.Credentials = new NetworkCredential(userName, password);
+            using (Stream requestStream = uploadRequest.GetRequestStream())
+            {
+              requestStream.Write(fileBytes, 0, fileBytes.Length);
+              requestStream.Close();
+            }
+
+
+            // Open file in browser
+            if (Output.OpenFileInBrowser)
+            {
+              V3.WebHelper.OpenUrl(url + fullFileName);
+            }
+
+            // Copy file URL
+            if (Output.CopyFileUrl)
+            {
+              Clipboard.SetText(url + fullFileName);
+            }
+
+            return new V3.SendResult(V3.Result.Success,
+                                     new Output(Output.Name,
+                                                Output.Server,
+                                                Output.Port,
+                                                Output.PassiveMode,
+                                                (rememberCredentials) ? userName : Output.UserName,
+                                                (rememberCredentials) ? password : Output.Password,
+                                                Output.RemotePath,
+                                                Output.FileName,
+                                                Output.FileFormat,
+                                                Output.OverwriteExistingFile,
+                                                Output.OpenFileInBrowser,
+                                                Output.CopyFileUrl));
+
+
+          }
+          catch (WebException ex) when (ex.Response is FtpWebResponse)
+          {
+
+            switch (((FtpWebResponse)ex.Response).StatusCode)
+            {
+              case FtpStatusCode.NotLoggedIn:
+                // Login failed
+                showLogin = true;
+                break;
+              default:
+                throw;
+            }
+
+          }
+
+        }
 
       }
       catch (Exception ex)
@@ -141,6 +296,6 @@ namespace BS.Output.Ftp
       }
 
     }
-      
+
   }
 }

@@ -6,11 +6,11 @@ namespace BS.Output.Ftp
   partial class Credentials : Window
   {
 
-    public Credentials(string url, string userName, string password, bool remember)
+    public Credentials(string server, int port, string remotePath, string userName, string password, bool remember)
     {
       InitializeComponent();
 
-      Url.Text = url;
+      Url.Text = string.Format("ftp://{0}:{1}/{2}", server, port, remotePath);
       UserNameTextBox.Text = userName;
       PasswordBox.Password = password;
       RememberCheckBox.IsChecked = remember;

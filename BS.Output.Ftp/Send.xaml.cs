@@ -6,11 +6,11 @@ namespace BS.Output.Ftp
   partial class Send : Window
   {
 
-    public Send(string url, string remotePath, string fileName)
+    public Send(string server, int port, string remotePath, string fileName)
     {
       InitializeComponent();
 
-      Url.Text = url;
+      Url.Text = string.Format("ftp://{0}:{1}", server, port); 
       RemotePathTextBox.Text = remotePath;
       FileNameTextBox.Text = fileName;
 

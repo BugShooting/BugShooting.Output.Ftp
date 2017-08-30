@@ -5,7 +5,7 @@
   {
     
     string name;
-    string url;
+    string server;
     int port;
     bool passiveMode;
     string userName;
@@ -18,7 +18,7 @@
     bool copyFileUrl;
 
     public Output(string name,
-                  string url,
+                  string server,
                   int port,
                   bool passiveMode,
                   string userName,
@@ -31,7 +31,7 @@
                   bool copyFileUrl)
     {
       this.name = name;
-      this.url = url;
+      this.server = server;
       this.port = port;
       this.passiveMode = passiveMode;
       this.userName = userName;
@@ -51,12 +51,12 @@
 
     public string Information
     {
-      get { return url; }
+      get { return string.Format("ftp://{0}:{1}/{2}", server, port, remotePath); }
     }
 
-    public string Url
+    public string Server
     {
-      get { return url; }
+      get { return server; }
     }
 
     public int Port

@@ -33,7 +33,7 @@ namespace BS.Output.Ftp
       }
 
       NameTextBox.Text = output.Name;
-      UrlTextBox.Text = output.Url;
+      ServerTextBox.Text = output.Server;
       PortTextBox.Text = output.Port.ToString();
       RemotePathTextBox.Text = output.RemotePath;
       PassiveModeCheckBox.IsChecked = output.PassiveMode;
@@ -54,12 +54,12 @@ namespace BS.Output.Ftp
       CopyFileUrlCheckBox.IsChecked = output.CopyFileUrl;
 
       NameTextBox.TextChanged += ValidateData;
-      UrlTextBox.TextChanged += ValidateData;
+      ServerTextBox.TextChanged += ValidateData;
       PortTextBox.TextChanged += ValidateData;
       FileFormatComboBox.SelectionChanged += ValidateData;
       ValidateData(null, null);
 
-      UrlTextBox.Focus();
+      ServerTextBox.Focus();
 
     }
      
@@ -68,9 +68,9 @@ namespace BS.Output.Ftp
       get { return NameTextBox.Text; }
     }
 
-    public string Url
+    public string Server
     {
-      get { return UrlTextBox.Text; }
+      get { return ServerTextBox.Text; }
     }
 
     public int Port
@@ -154,7 +154,7 @@ namespace BS.Output.Ftp
     private void ValidateData(object sender, EventArgs e)
     {
       OK.IsEnabled = Validation.IsValid(NameTextBox) &&
-                     Validation.IsValid(UrlTextBox) &&
+                     Validation.IsValid(ServerTextBox) &&
                      Validation.IsValid(PortTextBox) &&
                      Validation.IsValid(FileFormatComboBox);
     }
@@ -162,6 +162,11 @@ namespace BS.Output.Ftp
     private void OK_Click(object sender, RoutedEventArgs e)
     {
       DialogResult = true;     
+    }
+
+    private void FullPath_TextChanged(object sender, TextChangedEventArgs e)
+    {
+      FullPath.Text = string.Format("ftp://{0}:{1}/{2}", ServerTextBox.Text, PortTextBox.Text, RemotePathTextBox.Text);
     }
 
   }

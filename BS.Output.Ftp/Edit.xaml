@@ -26,8 +26,8 @@
         <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
-      <Label Grid.Column="0">Url</Label>
-      <TextBox x:Name="UrlTextBox" Grid.Column="1" VerticalContentAlignment="Center" local:Validation.Required="True" />
+      <Label Grid.Column="0">Server</Label>
+      <TextBox x:Name="ServerTextBox" Grid.Column="1" VerticalContentAlignment="Center" local:Validation.Required="True" TextChanged="FullPath_TextChanged" />
     </Grid>
     <Grid Margin="4">
       <Grid.ColumnDefinitions>
@@ -35,7 +35,7 @@
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
       <Label Grid.Column="0">Port</Label>
-      <TextBox x:Name="PortTextBox" Grid.Column="1" VerticalContentAlignment="Center" PreviewTextInput="Port_PreviewTextInput" local:Validation.Required="True" />
+      <TextBox x:Name="PortTextBox" Grid.Column="1" VerticalContentAlignment="Center" PreviewTextInput="Port_PreviewTextInput" local:Validation.Required="True" TextChanged="FullPath_TextChanged" />
     </Grid>
     <Grid Margin="4">
       <Grid.ColumnDefinitions>
@@ -66,7 +66,14 @@
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
       <Label Grid.Column="0">Remote path</Label>
-      <TextBox x:Name="RemotePathTextBox" Grid.Column="1" VerticalContentAlignment="Center" />
+      <TextBox x:Name="RemotePathTextBox" Grid.Column="1" VerticalContentAlignment="Center" TextChanged="FullPath_TextChanged" />
+    </Grid>
+    <Grid Margin="4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock x:Name="FullPath" Grid.Column="1" TextWrapping="Wrap" />
     </Grid>
     <Grid Margin="4">
       <Grid.ColumnDefinitions>
