@@ -50,9 +50,7 @@ namespace BS.Output.Ftp
       }
             
       OverwriteExistFileCheckBox.IsChecked = output.OverwriteExistingFile;
-      OpenFileInBrowserCheckBox.IsChecked = output.OpenFileInBrowser;
-      CopyFileUrlCheckBox.IsChecked = output.CopyFileUrl;
-
+    
       NameTextBox.TextChanged += ValidateData;
       ServerTextBox.TextChanged += ValidateData;
       PortTextBox.TextChanged += ValidateData;
@@ -111,16 +109,6 @@ namespace BS.Output.Ftp
     public bool OverwriteExistFile
     {
       get { return OverwriteExistFileCheckBox.IsChecked.Value; }
-    }
-
-    public bool OpenFileInBrowser
-    {
-      get { return OpenFileInBrowserCheckBox.IsChecked.Value; }
-    }
-
-    public bool CopyFileUrl
-    {
-      get { return CopyFileUrlCheckBox.IsChecked.Value; }
     }
 
     private void Port_PreviewTextInput(object sender, TextCompositionEventArgs e)

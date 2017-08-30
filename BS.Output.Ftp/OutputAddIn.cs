@@ -49,8 +49,6 @@ namespace BS.Output.Ftp
                                  String.Empty, 
                                  "Screenshot",
                                  String.Empty, 
-                                 false,
-                                 false,
                                  false);
 
       return EditOutput(Owner, output);
@@ -76,9 +74,7 @@ namespace BS.Output.Ftp
                           edit.RemotePath,
                           edit.FileName,
                           edit.FileFormat,
-                          edit.OverwriteExistFile,
-                          edit.OpenFileInBrowser,
-                          edit.CopyFileUrl);
+                          edit.OverwriteExistFile);
       }
       else
       {
@@ -102,8 +98,6 @@ namespace BS.Output.Ftp
       outputValues.Add(new OutputValue("FileName", Output.FileName));
       outputValues.Add(new OutputValue("FileFormat", Output.FileFormat));
       outputValues.Add(new OutputValue("OverwriteExistingFile", Convert.ToString(Output.OverwriteExistingFile)));
-      outputValues.Add(new OutputValue("OpenFilyInBrowser", Convert.ToString(Output.OpenFileInBrowser)));
-      outputValues.Add(new OutputValue("CopyFileUrl", Convert.ToString(Output.CopyFileUrl)));
 
       return outputValues;
       
@@ -121,9 +115,7 @@ namespace BS.Output.Ftp
                         OutputValues["RemotePath", ""].Value,
                         OutputValues["FileName", "Screenshot"].Value, 
                         OutputValues["FileFormat", ""].Value,
-                        Convert.ToBoolean(OutputValues["OverwriteExistingFile", Convert.ToString(false)].Value),
-                        Convert.ToBoolean(OutputValues["OpenFileInBrowser", Convert.ToString(false)].Value),
-                        Convert.ToBoolean(OutputValues["CopyFileUrl", Convert.ToString(false)].Value));
+                        Convert.ToBoolean(OutputValues["OverwriteExistingFile", Convert.ToString(false)].Value));
 
     }
 
@@ -243,19 +235,6 @@ namespace BS.Output.Ftp
               requestStream.Close();
             }
 
-
-            // Open file in browser
-            if (Output.OpenFileInBrowser)
-            {
-              V3.WebHelper.OpenUrl(url + fullFileName);
-            }
-
-            // Copy file URL
-            if (Output.CopyFileUrl)
-            {
-              Clipboard.SetText(url + fullFileName);
-            }
-
             return new V3.SendResult(V3.Result.Success,
                                      new Output(Output.Name,
                                                 Output.Server,
@@ -266,9 +245,7 @@ namespace BS.Output.Ftp
                                                 Output.RemotePath,
                                                 Output.FileName,
                                                 Output.FileFormat,
-                                                Output.OverwriteExistingFile,
-                                                Output.OpenFileInBrowser,
-                                                Output.CopyFileUrl));
+                                                Output.OverwriteExistingFile));
 
 
           }

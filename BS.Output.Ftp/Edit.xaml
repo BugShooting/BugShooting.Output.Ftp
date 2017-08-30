@@ -96,20 +96,6 @@
       </Grid.ColumnDefinitions>
       <CheckBox x:Name="OverwriteExistFileCheckBox" Grid.Column="1" Content="Overwrite existing file" />
     </Grid>
-    <Grid Margin="4">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
-        <ColumnDefinition Width="*"/>
-      </Grid.ColumnDefinitions>
-      <CheckBox x:Name="OpenFileInBrowserCheckBox" Grid.Column="1" Content="Open file in browser after sending" />
-    </Grid>
-    <Grid Margin="4">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
-        <ColumnDefinition Width="*"/>
-      </Grid.ColumnDefinitions>
-      <CheckBox x:Name="CopyFileUrlCheckBox" Grid.Column="1" Content="Copy file URL to clipboard" />
-    </Grid>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0" >
       <Button x:Name="OK" Width="80" Height="24" Content="OK" Margin="4" IsDefault="True" Click="OK_Click" />
       <Button Width="80" Height="24" Content="Cancel" Margin="4" IsCancel="True" />

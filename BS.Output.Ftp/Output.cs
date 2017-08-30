@@ -14,8 +14,6 @@
     string fileName;
     string fileFormat;
     bool overwriteExistingFile;
-    bool openFileInBrowser;
-    bool copyFileUrl;
 
     public Output(string name,
                   string server,
@@ -26,9 +24,7 @@
                   string remotePath,
                   string fileName, 
                   string fileFormat,
-                  bool overwriteExistingFile,
-                  bool openFileInBrowser, 
-                  bool copyFileUrl)
+                  bool overwriteExistingFile)
     {
       this.name = name;
       this.server = server;
@@ -40,8 +36,6 @@
       this.fileName = fileName;
       this.fileFormat = fileFormat;
       this.overwriteExistingFile = overwriteExistingFile;
-      this.openFileInBrowser = openFileInBrowser;
-      this.copyFileUrl = copyFileUrl;
     }
     
     public string Name
@@ -97,16 +91,6 @@
     public bool OverwriteExistingFile
     {
       get { return overwriteExistingFile; }
-    }
-
-    public bool OpenFileInBrowser
-    {
-      get { return openFileInBrowser; }
-    }
-
-    public bool CopyFileUrl
-    {
-      get { return copyFileUrl; }
     }
 
   }
