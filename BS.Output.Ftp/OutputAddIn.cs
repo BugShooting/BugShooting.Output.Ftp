@@ -181,7 +181,7 @@ namespace BS.Output.Ftp
               listRequest.UsePassive = Output.PassiveMode;
               listRequest.Credentials = new NetworkCredential(userName, password);
 
-              using (FtpWebResponse response = (FtpWebResponse)listRequest.GetResponse())
+              using (FtpWebResponse response = (FtpWebResponse)await listRequest.GetResponseAsync())
               {
                 long size = response.ContentLength;
                 using (Stream dataStream = response.GetResponseStream())
@@ -229,9 +229,9 @@ namespace BS.Output.Ftp
             uploadRequest.Method = WebRequestMethods.Ftp.UploadFile;
             uploadRequest.UsePassive = Output.PassiveMode;
             uploadRequest.Credentials = new NetworkCredential(userName, password);
-            using (Stream requestStream = uploadRequest.GetRequestStream())
+            using (Stream requestStream = await uploadRequest.GetRequestStreamAsync())
             {
-              requestStream.Write(fileBytes, 0, fileBytes.Length);
+              await requestStream.WriteAsync(fileBytes, 0, fileBytes.Length);
               requestStream.Close();
             }
 
