@@ -1,4 +1,6 @@
-﻿namespace BS.Output.Ftp
+﻿using BS.Plugin.V3.Output;
+
+namespace BugShooting.Output.Ftp
 {
 
   public class Output: IOutput 

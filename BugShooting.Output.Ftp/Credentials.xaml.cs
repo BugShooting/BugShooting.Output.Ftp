@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace BS.Output.Ftp
+namespace BugShooting.Output.Ftp
 {
   partial class Credentials : Window
   {

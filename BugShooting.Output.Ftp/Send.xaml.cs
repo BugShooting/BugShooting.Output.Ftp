@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace BS.Output.Ftp
+namespace BugShooting.Output.Ftp
 {
   partial class Send : Window
   {

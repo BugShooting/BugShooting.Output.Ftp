@@ -6,10 +6,13 @@ using System.Windows.Forms;
 using System.ServiceModel;
 using System.Web;
 using System.Threading.Tasks;
+using BS.Plugin.V3.Output;
+using BS.Plugin.V3.Common;
+using BS.Plugin.V3.Utilities;
 
-namespace BS.Output.Ftp
+namespace BugShooting.Output.Ftp
 {
-  public class OutputAddIn: V3.OutputAddIn<Output>
+  public class OutputPlugin: OutputPlugin<Output>
   {
 
     protected override string Name
@@ -83,49 +86,49 @@ namespace BS.Output.Ftp
 
     }
 
-    protected override OutputValueCollection SerializeOutput(Output Output)
+    protected override OutputValues SerializeOutput(Output Output)
     {
 
-      OutputValueCollection outputValues = new OutputValueCollection();
+      OutputValues outputValues = new OutputValues();
 
-      outputValues.Add(new OutputValue("Name", Output.Name));
-      outputValues.Add(new OutputValue("Server", Output.Server));
-      outputValues.Add(new OutputValue("Port", Output.Port.ToString()));
-      outputValues.Add(new OutputValue("PassiveMode", Convert.ToString(Output.PassiveMode)));
-      outputValues.Add(new OutputValue("UserName", Output.UserName));
-      outputValues.Add(new OutputValue("Password",Output.Password, true));
-      outputValues.Add(new OutputValue("RemotePath", Output.RemotePath));
-      outputValues.Add(new OutputValue("FileName", Output.FileName));
-      outputValues.Add(new OutputValue("FileFormat", Output.FileFormat));
-      outputValues.Add(new OutputValue("OverwriteExistingFile", Convert.ToString(Output.OverwriteExistingFile)));
+      outputValues.Add("Name", Output.Name);
+      outputValues.Add("Server", Output.Server);
+      outputValues.Add("Port", Output.Port.ToString());
+      outputValues.Add("PassiveMode", Convert.ToString(Output.PassiveMode));
+      outputValues.Add("UserName", Output.UserName);
+      outputValues.Add("Password",Output.Password, true);
+      outputValues.Add("RemotePath", Output.RemotePath);
+      outputValues.Add("FileName", Output.FileName);
+      outputValues.Add("FileFormat", Output.FileFormat);
+      outputValues.Add("OverwriteExistingFile", Convert.ToString(Output.OverwriteExistingFile));
 
       return outputValues;
       
     }
 
-    protected override Output DeserializeOutput(OutputValueCollection OutputValues)
+    protected override Output DeserializeOutput(OutputValues OutputValues)
     {
 
-      return new Output(OutputValues["Name", this.Name].Value,
-                        OutputValues["Server", ""].Value,
-                        Convert.ToInt32(OutputValues["Port", Convert.ToString(21)].Value),
-                        Convert.ToBoolean(OutputValues["PassiveMode", Convert.ToString(false)].Value),
-                        OutputValues["UserName", ""].Value,
-                        OutputValues["Password", ""].Value,
-                        OutputValues["RemotePath", ""].Value,
-                        OutputValues["FileName", "Screenshot"].Value, 
-                        OutputValues["FileFormat", ""].Value,
-                        Convert.ToBoolean(OutputValues["OverwriteExistingFile", Convert.ToString(false)].Value));
+      return new Output(OutputValues["Name", this.Name],
+                        OutputValues["Server", ""],
+                        Convert.ToInt32(OutputValues["Port", Convert.ToString(21)]),
+                        Convert.ToBoolean(OutputValues["PassiveMode", Convert.ToString(false)]),
+                        OutputValues["UserName", ""],
+                        OutputValues["Password", ""],
+                        OutputValues["RemotePath", ""],
+                        OutputValues["FileName", "Screenshot"], 
+                        OutputValues["FileFormat", ""],
+                        Convert.ToBoolean(OutputValues["OverwriteExistingFile", Convert.ToString(false)]));
 
     }
 
-    protected override async Task<V3.SendResult> Send(IWin32Window Owner, Output Output, V3.ImageData ImageData)
+    protected override async Task<SendResult> Send(IWin32Window Owner, Output Output, ImageData ImageData)
     {
 
       try
       {
 
-        string fileName = V3.FileHelper.GetFileName(Output.FileName, Output.FileFormat, ImageData);
+        string fileName = FileHelper.GetFileName(Output.FileName, ImageData);
 
         // Show send window
         Send send = new Send(Output.Server, Output.Port, Output.RemotePath, fileName);
@@ -135,11 +138,11 @@ namespace BS.Output.Ftp
 
         if (!send.ShowDialog() == true)
         {
-          return new V3.SendResult(V3.Result.Canceled);
+          return new SendResult(Result.Canceled);
         }
 
         string url = string.Format("ftp://{0}:{1}/{2}/", Output.Server, Output.Port, send.RemotePath);
-        string fullFileName = send.FileName + "." + V3.FileHelper.GetFileExtention(Output.FileFormat);
+        string fullFileName = send.FileName + "." + FileHelper.GetFileExtention(Output.FileFormat);
         
         string userName = Output.UserName;
         string password = Output.Password;
@@ -160,7 +163,7 @@ namespace BS.Output.Ftp
 
             if (credentials.ShowDialog() != true)
             {
-              return new V3.SendResult(V3.Result.Canceled);
+              return new SendResult(Result.Canceled);
             }
 
             userName = credentials.UserName;
@@ -203,7 +206,7 @@ namespace BS.Output.Ftp
                         }
                         else
                         {
-                          return new V3.SendResult(V3.Result.Canceled);
+                          return new SendResult(Result.Canceled);
                         }
 
                       }
@@ -222,7 +225,7 @@ namespace BS.Output.Ftp
 
 
             string fileUrl = url + fullFileName;
-            byte[] fileBytes = V3.FileHelper.GetFileBytes(Output.FileFormat, ImageData);
+            byte[] fileBytes = FileHelper.GetFileBytes(Output.FileFormat, ImageData);
 
             // Upload file
             FtpWebRequest uploadRequest = (FtpWebRequest)WebRequest.Create(fileUrl);
@@ -235,17 +238,17 @@ namespace BS.Output.Ftp
               requestStream.Close();
             }
 
-            return new V3.SendResult(V3.Result.Success,
-                                     new Output(Output.Name,
-                                                Output.Server,
-                                                Output.Port,
-                                                Output.PassiveMode,
-                                                (rememberCredentials) ? userName : Output.UserName,
-                                                (rememberCredentials) ? password : Output.Password,
-                                                Output.RemotePath,
-                                                Output.FileName,
-                                                Output.FileFormat,
-                                                Output.OverwriteExistingFile));
+            return new SendResult(Result.Success,
+                                  new Output(Output.Name,
+                                            Output.Server,
+                                            Output.Port,
+                                            Output.PassiveMode,
+                                            (rememberCredentials) ? userName : Output.UserName,
+                                            (rememberCredentials) ? password : Output.Password,
+                                            Output.RemotePath,
+                                            Output.FileName,
+                                            Output.FileFormat,
+                                            Output.OverwriteExistingFile));
 
 
           }
@@ -269,7 +272,7 @@ namespace BS.Output.Ftp
       }
       catch (Exception ex)
       {
-        return new V3.SendResult(V3.Result.Failed, ex.Message);
+        return new SendResult(Result.Failed, ex.Message);
       }
 
     }
