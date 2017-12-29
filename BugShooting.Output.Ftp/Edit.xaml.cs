@@ -15,8 +15,8 @@ namespace BugShooting.Output.Ftp
     public Edit(Output output)
     {
       InitializeComponent();
-      
-      foreach (string fileNameReplacement in FileHelper.GetFileNameReplacements())
+
+      foreach (string fileNameReplacement in AttributeHelper.GetAttributeReplacements())
       {
         MenuItem item = new MenuItem();
         item.Header = new TextBlock() { Text = fileNameReplacement };

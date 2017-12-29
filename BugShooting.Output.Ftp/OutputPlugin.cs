@@ -128,7 +128,7 @@ namespace BugShooting.Output.Ftp
       try
       {
 
-        string fileName = FileHelper.GetFileName(Output.FileName, ImageData);
+        string fileName = AttributeHelper.ReplaceAttributes(Output.FileName, ImageData);
 
         // Show send window
         Send send = new Send(Output.Server, Output.Port, Output.RemotePath, fileName);
