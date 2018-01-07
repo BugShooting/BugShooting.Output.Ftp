@@ -142,7 +142,7 @@ namespace BugShooting.Output.Ftp
         }
 
         string url = string.Format("ftp://{0}:{1}/{2}/", Output.Server, Output.Port, send.RemotePath);
-        string fullFileName = send.FileName + "." + FileHelper.GetFileExtention(Output.FileFormat);
+        string fullFileName = send.FileName + "." + FileHelper.GetFileExtension(Output.FileFormat);
         
         string userName = Output.UserName;
         string password = Output.Password;
