@@ -1,14 +1,13 @@
-﻿using System;
+﻿using BS.Plugin.V3.Common;
+using BS.Plugin.V3.Output;
+using BS.Plugin.V3.Utilities;
+using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Windows.Forms;
-using System.ServiceModel;
-using System.Web;
 using System.Threading.Tasks;
-using BS.Plugin.V3.Output;
-using BS.Plugin.V3.Common;
-using BS.Plugin.V3.Utilities;
+using System.Windows.Forms;
 
 namespace BugShooting.Output.Ftp
 {
@@ -51,7 +50,7 @@ namespace BugShooting.Output.Ftp
                                  String.Empty, 
                                  String.Empty, 
                                  "Screenshot",
-                                 String.Empty, 
+                                 FileHelper.GetFileFormats().First().ID,
                                  false);
 
       return EditOutput(Owner, output);
@@ -76,7 +75,7 @@ namespace BugShooting.Output.Ftp
                           edit.Password,
                           edit.RemotePath,
                           edit.FileName,
-                          edit.FileFormat,
+                          edit.FileFormatID,
                           edit.OverwriteExistFile);
       }
       else
@@ -99,7 +98,7 @@ namespace BugShooting.Output.Ftp
       outputValues.Add("Password",Output.Password, true);
       outputValues.Add("RemotePath", Output.RemotePath);
       outputValues.Add("FileName", Output.FileName);
-      outputValues.Add("FileFormat", Output.FileFormat);
+      outputValues.Add("FileFormatID", Output.FileFormatID.ToString());
       outputValues.Add("OverwriteExistingFile", Convert.ToString(Output.OverwriteExistingFile));
 
       return outputValues;
@@ -116,8 +115,8 @@ namespace BugShooting.Output.Ftp
                         OutputValues["UserName", ""],
                         OutputValues["Password", ""],
                         OutputValues["RemotePath", ""],
-                        OutputValues["FileName", "Screenshot"], 
-                        OutputValues["FileFormat", ""],
+                        OutputValues["FileName", "Screenshot"],
+                        new Guid(OutputValues["FileFormatID", ""]),
                         Convert.ToBoolean(OutputValues["OverwriteExistingFile", Convert.ToString(false)]));
 
     }
@@ -141,8 +140,15 @@ namespace BugShooting.Output.Ftp
           return new SendResult(Result.Canceled);
         }
 
-        string url = string.Format("ftp://{0}:{1}/{2}/", Output.Server, Output.Port, send.RemotePath);
-        string fullFileName = send.FileName + "." + FileHelper.GetFileExtension(Output.FileFormat);
+        string url = string.Format("ftp://{0}:{1}/", Output.Server, Output.Port);
+
+        if (!string.IsNullOrEmpty(send.RemotePath))
+        {
+          url += send.RemotePath + "/";
+        }
+
+        IFileFormat fileFormat = FileHelper.GetFileFormat(Output.FileFormatID);
+        string fullFileName = send.FileName + "." + fileFormat.FileExtension;
         
         string userName = Output.UserName;
         string password = Output.Password;
@@ -225,7 +231,7 @@ namespace BugShooting.Output.Ftp
 
 
             string fileUrl = url + fullFileName;
-            byte[] fileBytes = FileHelper.GetFileBytes(Output.FileFormat, ImageData);
+            byte[] fileBytes = FileHelper.GetFileBytes(Output.FileFormatID, ImageData);
 
             // Upload file
             FtpWebRequest uploadRequest = (FtpWebRequest)WebRequest.Create(fileUrl);
@@ -247,7 +253,7 @@ namespace BugShooting.Output.Ftp
                                             (rememberCredentials) ? password : Output.Password,
                                             Output.RemotePath,
                                             Output.FileName,
-                                            Output.FileFormat,
+                                            Output.FileFormatID,
                                             Output.OverwriteExistingFile));
 
 

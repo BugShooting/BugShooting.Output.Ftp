@@ -1,4 +1,5 @@
 ﻿using BS.Plugin.V3.Output;
+using System;
 
 namespace BugShooting.Output.Ftp
 {
@@ -14,7 +15,7 @@ namespace BugShooting.Output.Ftp
     string password;
     string remotePath;
     string fileName;
-    string fileFormat;
+    Guid fileFormatID;
     bool overwriteExistingFile;
 
     public Output(string name,
@@ -24,8 +25,8 @@ namespace BugShooting.Output.Ftp
                   string userName,
                   string password,
                   string remotePath,
-                  string fileName, 
-                  string fileFormat,
+                  string fileName,
+                  Guid fileFormatID,
                   bool overwriteExistingFile)
     {
       this.name = name;
@@ -36,7 +37,7 @@ namespace BugShooting.Output.Ftp
       this.password = password;
       this.remotePath = remotePath;
       this.fileName = fileName;
-      this.fileFormat = fileFormat;
+      this.fileFormatID = fileFormatID;
       this.overwriteExistingFile = overwriteExistingFile;
     }
     
@@ -85,9 +86,9 @@ namespace BugShooting.Output.Ftp
       get { return fileName; }
     }
 
-    public string FileFormat
+    public Guid FileFormatID
     {
-      get { return fileFormat; }
+      get { return fileFormatID; }
     }
 
     public bool OverwriteExistingFile
